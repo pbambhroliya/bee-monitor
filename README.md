@@ -64,6 +64,60 @@ its wrong boxes (about 20 minutes), download the file and send it.
 The file is a normal YOLO dataset (`images/`, `labels/`, `data.yaml`), so it works with any YOLO training,
 and YOLO dataset zips from other review tools can be added the same way.
 
+## From received files to a new model (for the person who trains)
+
+Teammates send you their `hardneg_<name>_<date>.zip` files. Five steps turn them into a better model.
+Only step ④ needs a computer with an NVIDIA GPU (e.g. a university GPU cluster).
+
+```
+① Import zips (app)  →  ② build ONE dataset (laptop)  →  ③ copy it to the GPU computer
+→  ④ train: BuzzSet + new pictures  →  ⑤ bring the model back, check it, share it
+```
+
+**Before the first time:** choose 4–6 **test videos** (never used for training), put their names into
+`configs/split.yaml` and set their status to `test` in `videos.csv`.
+
+**① Import.** In the app, open page **Hard negatives** → *For the person who trains the model: add files
+you received*. Upload the zips and press **Import**. Each zip becomes a folder `data/labeling/hardneg_*`,
+and its videos are marked `done` in `videos.csv`. Commit and push `videos.csv` so the team sees it. This
+step only sorts the files: nothing is combined or trained yet. Your own work counts too: download your zip
+and import it the same way.
+
+**② Combine everything into one training dataset** (on the laptop):
+```bash
+python -m beemon build-dataset data/labeling/hardneg_* --out data/datasets/hn_v1
+```
+This makes one YOLO dataset (`images/`, `labels/`, `data.yaml`), split into train / val / test **by video**.
+
+**③ Copy the dataset to the GPU computer:**
+```bash
+rsync -av data/datasets/hn_v1 <user>@<gpu-computer>:~/bee-monitor/data/datasets/
+```
+
+**④ Train: BuzzSet + the new pictures together.** Never train on the hard negatives alone. They are
+mostly "no insect" pictures, so the model would forget what insects look like. On the GPU computer,
+write `configs/hn_v1_plus_buzzset.yaml`:
+```yaml
+train: [<BuzzSet folder>/images/train, <full path>/data/datasets/hn_v1/images/train]
+val:   [<BuzzSet folder>/images/valid, <full path>/data/datasets/hn_v1/images/val]
+names: {0: bee, 1: bumblebee, 2: hoverfly, 3: other_insect, 4: moth}
+```
+Then continue training the current model, so it only learns the corrections:
+```bash
+python -m beemon train --preset finetune --weights models/yolo11m_buzzset.pt \
+       --data configs/hn_v1_plus_buzzset.yaml --name hn_v1
+```
+
+**⑤ Bring it back, check it, share it.** Copy `runs/hn_v1/weights/best.pt` to the laptop and clean it:
+```bash
+python -m beemon clean-model best.pt --out models/yolo11m_hn_v1.pt
+```
+It now appears in the app's model list. Run the old and the new model on the **same test video** (page
+*Track a video*). Fewer boxes on flowers and fewer rejected tracks mean it is better. If it is better,
+upload it to Google Drive and update the model link at the top of this README.
+
+More details and options: [docs/TRAINING.md](docs/TRAINING.md).
+
 ## What is in this folder
 
 ```

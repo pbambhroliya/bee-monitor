@@ -14,7 +14,7 @@ their **visits**. Everything runs on your own computer in a simple app with thre
 You need **Python 3.10 or newer** ([python.org](https://www.python.org/downloads/); on Windows tick
 *"Add python.exe to PATH"* during the installation).
 
-1. **Get the code.** `git clone <https://github.com/pbambhroliya/bee-monitor.git>`, or on GitHub: *Code → Download ZIP* and unzip it.
+1. **Get the code.** `git clone https://github.com/pbambhroliya/bee-monitor.git`, or on GitHub: *Code → Download ZIP* and unzip it.
 2. **Download the model** → <!-- MODEL LINK: replace the next line with your Google Drive link -->
    **[yolo11m_buzzset.pt (Google Drive)](https://drive.google.com/drive/folders/1Lv1iggqYYJiTYJS4M9TcgNSGLdNa0p8H?usp=sharing)** and put it into the `models` folder.
 3. **Start the app.**

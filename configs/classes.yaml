@@ -1,0 +1,13 @@
+# Class list used for YOUR OWN labels (CVAT) and datasets built with `beemon build-dataset`.
+# The order defines the class ids and matches configs/buzzset_data.yaml, so a model
+# pre-trained on BuzzSet can be fine-tuned on your data without re-learning its output layer.
+# Use exactly these label names in CVAT.
+#
+# Two-stage alternative: build the detector dataset with --single-class (one class "insect")
+# and train a crop classifier for the species (see README, step 8).
+names:
+  - bee
+  - bumblebee
+  - hoverfly
+  - other_insect
+  - moth

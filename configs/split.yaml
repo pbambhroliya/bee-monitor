@@ -1,0 +1,10 @@
+# Which videos are used for what. Use the video names of videos.csv (e.g. 20240801_Maize_RIMG0047).
+# Decide this BEFORE labelling and never change test videos afterwards:
+# every number in the report is measured on them.
+
+test_videos:          # never used for training (frames, hard negatives, synthetic data)
+  - 20240801_Maize_RIMG0047   # example — replace with your 4-6 chosen test videos (mark them "test" in videos.csv)
+
+val_videos: []        # optional: fixed validation videos; empty = pick val_fraction of the rest
+val_fraction: 0.2
+seed: 42

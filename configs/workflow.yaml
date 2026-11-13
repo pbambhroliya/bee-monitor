@@ -1,0 +1,58 @@
+# The training workflow (README: "Training workflow"). Paths are relative to the project folder.
+#
+#   base    train several YOLO models on BuzzSet, keep the best one          -> models/base.pt
+#   r1      label a few 2024 videos with it (hard negatives!), fine-tune     -> models/r1.pt
+#   r2      label ALL 2024 videos with r1, review in CVAT, train             -> models/r2.pt
+#   ...     repeat while the gold test score improves                        -> models/detector.pt (latest)
+
+classes: configs/classes.yaml
+split: configs/split.yaml          # TEST videos are never auto-labelled or trained on
+videos_dir: videos                 # the 2024 videos (beemon download ... or copy them here)
+
+base:                              # stage 1: a new base model trained on BuzzSet only
+  data: configs/buzzset_data.yaml
+  candidates: [yolo11s.pt, yolo11m.pt, yolo11l.pt, yolo11x.pt, yolo26m.pt]   # COCO starting weights
+  weights_dir: models/pretrained   # starting weights (Ultralytics downloads them)
+  imgsz: 960
+  epochs: 150
+  patience: 30
+  batch: 0.7                       # 0-1 = fraction of GPU memory (automatic batch size)
+  select_metric: mAP50-95          # decided on the GOLD test set when it exists, otherwise BuzzSet test
+  prefer_smaller_within: 0.0       # e.g. 0.01: take a smaller (faster) model if it is within 0.01 of the best
+
+gold:                              # hand-labelled CVAT batches: the only labels we trust 100 %
+  test_batches: [data/labeling/gold_test]   # frames of the TEST videos -> honest score for every model
+  train_batches: []                # optional hand-labelled frames of training videos (e.g. earlier CVAT work)
+
+rounds:                            # each round: current model labels videos -> (review) -> fine-tune
+  - name: r1                       # hard-negative round: few videos, flower centres become background
+    videos: 8                      # number of training videos, a list of names, or all
+    review: false                  # true = stop after labelling until the CVAT corrections are in
+  - name: r2                       # the large dataset: all 2024 videos, labelled by r1
+    videos: all
+    review: true
+
+teacher:                           # how the current model labels videos
+  process_config: configs/autolabel.yaml
+  min_track_conf: 0.35             # positive labels only from tracks with at least this mean confidence
+  min_det_ratio: 0.5               # ... and detected in at least half of their frames
+  min_box_conf: 0.25               # every labelled box: at least this confident ...
+  min_box_motion: 1.5              # ... and moving more than its surroundings (bees ~2-9, flower centres ~1;
+                                   #     tracks that drift onto a flower after the bee left are caught here)
+  frames_per_video: 300
+  min_gap_s: 0.5                   # min. time between two chosen frames of a video (avoids duplicates)
+  background_fraction: 0.3         # share of insect-free frames
+  hard_positive_share: 0.3         # share of positives where the model missed a tracked bee
+  hard_negative_share: 0.7         # share of background frames that contain rejected tracks
+  review_uncertain: 150            # uncertain frames sent to review (not used before a human labels them)
+  review_random: 60                # random auto-labelled frames to measure label quality
+
+finetune:
+  from: previous                   # previous = continue from the model that labelled the round; base = from base
+  mode: rgb                        # rgb | mie  (motion-informed frames, README "Motion")
+  mie_offset: 4
+  imgsz: 1280
+  epochs: 80
+  patience: 20
+  lr0: 0.002
+  batch: 0.7

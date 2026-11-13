@@ -1,0 +1,13 @@
+[server]
+# the app reads videos and models from their place on this computer; uploads are not needed
+maxUploadSize = 1024
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#d98e04"
+
+[client]
+# hide the "Deploy" button: the app runs on this computer
+toolbarMode = "minimal"

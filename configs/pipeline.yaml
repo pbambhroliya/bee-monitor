@@ -1,0 +1,28 @@
+# Your processing settings. Anything not listed here comes from beemon/default_config.yaml,
+# where every option is explained. Copy any option from there into this file to change it.
+
+detector:
+  weights: models/detector.pt
+  input: rgb          # set to mie when you use a model trained on motion-informed frames
+  imgsz: 1280
+  conf: 0.10
+  device: null        # null = GPU if available, otherwise CPU
+
+motion:
+  offset_frames: 4    # must be the same value the mie dataset was built with
+
+video:
+  frame_stride: 2     # laptop CPU: 2-3 ; cluster GPU: 1
+  idle_stride: 3
+
+tracker:
+  type: beetrack      # or bytetrack for the baseline comparison
+  max_speed_px_s: 1200
+  max_lost_s: 1.0
+
+filters:
+  min_duration_s: 0.4
+  static_min_s: 3.0
+
+output:
+  save_video: true

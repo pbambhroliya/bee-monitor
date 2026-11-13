@@ -1,0 +1,16 @@
+# Processing settings used when a model LABELS videos (workflow "process" step, on the cluster GPU).
+# Slower and more thorough than normal processing: every 2nd frame, no idle skipping,
+# test-time augmentation. detector.weights / detector.input are set by the workflow.
+
+detector:
+  imgsz: 1280
+  conf: 0.10
+  augment: true
+
+video:
+  frame_stride: 2
+  idle_stride: 1
+
+output:
+  save_video: false
+  save_thumbnails: true

@@ -1,0 +1,15 @@
+# Installed automatically by run.sh / run.bat.
+# By hand: (Linux without NVIDIA card first: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu)
+#          pip install -r requirements.txt && pip install -e .
+
+ultralytics>=8.3        # YOLO (also installs PyTorch)
+opencv-python>=4.8
+numpy
+pandas
+scipy
+pyyaml
+streamlit>=1.50         # the app
+altair
+imageio-ffmpeg          # annotated videos that play in the browser
+lap>=0.5.12             # only for the ByteTrack comparison tracker
+pytest                  # tests

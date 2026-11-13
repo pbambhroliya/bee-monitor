@@ -1,0 +1,12 @@
+# Public dataset used for PRE-TRAINING (stage 1), on any computer with a GPU.
+# Point `path` at your BuzzSet copy. Class order must match the label files.
+path: /path/to/buzzset/yolo   # CHANGE: folder of your BuzzSet copy (with images/ and labels/)
+train: images/train
+val: images/valid
+test: images/test
+names:
+  0: bee
+  1: bumblebee
+  2: hoverfly
+  3: other_insect
+  4: moth

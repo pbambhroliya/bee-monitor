@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "beemon"
+version = "0.1.0"
+description = "Bee monitoring: detect and track insects in field videos, count visits, collect hard negatives"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ultralytics>=8.3",
+    "opencv-python>=4.8",
+    "numpy",
+    "pandas",
+    "scipy",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+app = ["streamlit>=1.50", "altair"]
+video = ["imageio-ffmpeg"]
+baseline = ["lap>=0.5.12"]
+dev = ["pytest"]
+
+[project.scripts]
+beemon = "beemon.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["beemon*"]
+
+[tool.setuptools.package-data]
+beemon = ["default_config.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
